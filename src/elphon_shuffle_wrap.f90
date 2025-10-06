@@ -752,28 +752,6 @@
   IF ( ALLOCATED (ngk_all) )   DEALLOCATE(ngk_all)
   ! 
   CALL stop_clock ( 'elphon_wrap' )
-!DBSP
-!  DO iq = 1, nqc
-!    write(*,*) iq, xqc(:,iq)
-!    write(*,*)'epmatq(:,:,2,:,iq)',SUM(epmatq(:,:,2,:,iq))
-!    write(*,*)'epmatq(:,:,2,:,iq)**2',SUM((REAL(REAL(epmatq(:,:,2,:,iq))))**2)+&
-!               SUM((REAL(AIMAG(epmatq(:,:,2,:,iq))))**2)
-!  ENDDO
-!END
-  !
-  ! the electron-phonon wannier interpolation
-  !
-  IF(etf_mem == 0 .OR. etf_mem == 1 ) CALL ephwann_shuffle ( nqc, xqc )
-  IF(etf_mem == 2 ) THEN
-#if defined(__MPI)         
-    CALL ephwann_shuffle_mem ( nqc, xqc )
-#else
-    WRITE(stdout,'(/5x,a)') 'WARNING: etf_mem==2 only works with MPI'
-    WRITE(stdout,'(5x,a)')  '         Changing to etf_mem ==1 and continue ...'
-    etf_mem = 1
-    CALL ephwann_shuffle ( nqc, xqc )
-#endif
-  ENDIF        
   !
 5 format (8x,"q(",i5," ) = (",3f12.7," )") 
   !

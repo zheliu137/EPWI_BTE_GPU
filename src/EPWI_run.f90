@@ -35,11 +35,14 @@ SUBROUTINE run_BTE()
   integer,ALLOCATABLE :: Eqindex_K_gpu(:,:), List_gpu_tmp(:), List_gpu(:)
   ! ---------- GPU variables -------------
   !
+  ! Read data
   CALL start_clock('BTE_prepare')
   !
   CALL prepare_lattice()
   !
   call read_config()
+  !
+  ! Preprocessing
   !
   allocate(Eqindex_K(NPTK_K,2))
   allocate(List_gpu_tmp(NPTK_K))
@@ -101,6 +104,9 @@ SUBROUTINE run_BTE()
   enddo 
   if (mpime.eq.0)  &
               write(*,'("Info: Number of kq-pairs : ",1000I10)') Ntotal 
+  !
+  ! el-ph wannier interpolation
+  !
   allocate(F_n(Nlist_K,Nbands,3),DeltaF(Nlist_K,Nbands,3))
   F_n=0.d0
   DeltaF=0.d0
@@ -179,6 +185,8 @@ SUBROUTINE run_BTE()
               Elcond(1,1),Elcond(2,2),Elcond(3,3),concent,ChemPot! carrier concentration in unit of 1/cm^3
       endif
   endif  
+  !
+  ! Iterative BTE
   !
   if(convergence) then
       if (mpime.eq.0) write(*,'("Info: Iteration start...")'  )
@@ -577,7 +585,6 @@ SUBROUTINE ElConduct(F_n, Elcond)
         END DO
     END DO
     Elcond = spin_degen*Elcond*echarge*1.D21/(radps2ev**2)/(Kb*Te*Vol*nptk)
-    write(*,"(A,9ES20.10)")"elcond : ", Elcond
 !!------------------------------------------------------------------------------
 END SUBROUTINE ElConduct
 !!------------------------------------------------------------------------------
