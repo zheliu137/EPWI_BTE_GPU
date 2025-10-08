@@ -24,7 +24,7 @@ SUBROUTINE run_BTE()
   real(kind=8),allocatable :: el_energy_tmp(:,:), el_velocity_tmp(:,:,:)
   integer :: vec(3),ind(2)
   character(len=6) :: aux
-  character (len=256) :: filint, tmp_dir_nc
+  character (len=256) :: filint, tmp_dir_bte
   character (len=3) :: filelab
   real(kind=8) :: concent, relchange
   real(kind=8) :: Elcond(3,3)
@@ -90,7 +90,7 @@ SUBROUTINE run_BTE()
   PhononInterest=0
   N_plus=0
   naccum=0
-
+  !
   CALL gpu_cuda_init_wrap()
   call Nprocesses_cuda(N_plus, naccum, PhononInterest)
   call Nprocesses_cuda_deal()
@@ -137,19 +137,19 @@ SUBROUTINE run_BTE()
   !
   CALL start_clock('BTE_iter')
   ! open files for output datas
-  tmp_dir_nc='output/'
-  ios=f_mkdir_sf(trim(tmp_dir_nc))
+  tmp_dir_bte='bte_outputs/'
+  ios=f_mkdir_sf(trim(tmp_dir_bte))
   if (mpime.eq.0) then
-      open(1001,file=trim(tmp_dir_nc)//'BTE.sigmavsT_RTA',status='replace')
+      open(1001,file=trim(tmp_dir_bte)//'BTE.sigmavsT_RTA',status='replace')
       if (convergence) then
-          open(2001,file=trim(tmp_dir_nc)//'BTE.sigmavsT_ITER',status='replace')
+          open(2001,file=trim(tmp_dir_bte)//'BTE.sigmavsT_ITER',status='replace')
       endif
-      open(3001,file=trim(tmp_dir_nc)//'BTE.sigmavsT_MRTA',status='replace')
+      open(3001,file=trim(tmp_dir_bte)//'BTE.sigmavsT_MRTA',status='replace')
   endif 
   ! output scattering rate
   if (mpime.eq.0) then
       write(aux,"(I0)") NINT(Te)
-      open(1,file=trim(tmp_dir_nc)//'BTE.sr.T'//trim(adjustl(aux))//'K',status='replace')
+      open(1,file=trim(tmp_dir_bte)//'BTE.sr.T'//trim(adjustl(aux))//'K',status='replace')
       do mm=1,NStateInterest
           i=StateInterest(1,mm)
           ll=StateInterest(2,mm)
